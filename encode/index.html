@@ -30,42 +30,45 @@ Decode!
       return "";
     }
   }
-  function customCompress(binary){
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+"
-    var spl = binary.split('');
-    var i = 0;
-    var str = "";
-    var final = "";
-    var digit = spl[i]
-    while (i < binary.length){
-      digit = spl[i];
-      while (spl[i] == digit){
-        str += digit;
-        i++;
-        if(i == 56){break;}
-      }
-      final += digit + chars[str.length];
-      str = "";
-    }
-    return final;
-  }
-
-  function customDecompress(comp){
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+";
-    if(comp.length != 0){
-      var spl = comp.match(/.{1,2}/g);
+  
+  function customEncode(binary){
+  	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+"
+    if(binary.length > 0){
+      var i = 0;
+      var spl = binary.split('');
+      var digit = Number(spl[0]);
       var final = "";
-      for(var i = 0; i < spl.length; i++){
-        var digit = spl[i][0];
-        var number = chars.indexOf(spl[i][1]);
-        for(var j = 0; j < number; j++){
-          final += digit;
+      var count = 0;
+      final += String(digit);
+      while (i < spl.length){
+        while (spl[i] == String(digit)){
+          count++;
+          i++;
         }
+        digit = 1 - digit;
+        final += chars[count - 1];
+        count = 0;
       }
       return final;
     } else {
-      return "";
+    	return "";
     }
+  }
+  
+  function customDecode(encoded){
+  	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+"
+    var i = 1;
+    var spl = encoded.split('');
+    var digit = Number(spl[0]);
+    var final = "";
+    while (i < spl.length){
+    	for (var j = 0; j < chars.indexOf(spl[i]) + 1; j++){
+      	final += String(digit);
+      }
+      digit = 1 - digit;
+      i++;
+    }
+    return final;
   }
 
   var txt = document.querySelector('#txt');
@@ -73,10 +76,10 @@ Decode!
   var en = document.querySelector('#en');
   var de = document.querySelector('#de');
   en.addEventListener('click',function(){
-    output.value = customCompress(convertToBinary(txt.value));
+    output.value = customEncode(convertToBinary(txt.value));
   });
   de.addEventListener('click',function(){
-  	output.value = convertToText(customDecompress(txt.value));
+  	output.value = convertToText(customDecode(txt.value));
   });
 </script>
 <style>
