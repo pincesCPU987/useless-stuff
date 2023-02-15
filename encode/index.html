@@ -1,0 +1,88 @@
+<textarea placeholder="Enter text here" id="txt"></textarea>
+<br/>
+<button id="en">
+Encode!
+</button>
+<button id="de">
+Decode!
+</button>
+<br/>
+<textarea readonly onclick="this.select();document.execCommand('copy');" id="output"></textarea>
+<script>
+  function convertToBinary(text){
+    var string = "";
+    for(var i = 0; i < text.length; i++){
+      thing = text.charCodeAt(i).toString(2);
+      string += "0000000000000000".substr(thing.length) + thing;
+    }
+    return string;
+  }
+  function convertToText(binary){
+    if(binary.length != 0){
+      var text = "";
+      spl = binary.match(/.{1,16}/g);
+      for(var i = 0; i < spl.length; i++){
+        var char = String.fromCharCode(parseInt(spl[i], 2));
+        text += char;
+      }
+      return text;
+    } else {
+      return "";
+    }
+  }
+  function customCompress(binary){
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+"
+    var spl = binary.split('');
+    var i = 0;
+    var str = "";
+    var final = "";
+    var digit = spl[i]
+    while (i < binary.length){
+      digit = spl[i];
+      while (spl[i] == digit){
+        str += digit;
+        i++;
+        if(i == 56){break;}
+      }
+      final += digit + chars[str.length];
+      str = "";
+    }
+    return final;
+  }
+
+  function customDecompress(comp){
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+";
+    if(comp.length != 0){
+      var spl = comp.match(/.{1,2}/g);
+      var final = "";
+      for(var i = 0; i < spl.length; i++){
+        var digit = spl[i][0];
+        var number = chars.indexOf(spl[i][1]);
+        for(var j = 0; j < number; j++){
+          final += digit;
+        }
+      }
+      return final;
+    } else {
+      return "";
+    }
+  }
+
+  var txt = document.querySelector('#txt');
+  var output = document.querySelector('#output');
+  var en = document.querySelector('#en');
+  var de = document.querySelector('#de');
+  en.addEventListener('click',function(){
+    output.value = customCompress(convertToBinary(txt.value));
+  });
+  de.addEventListener('click',function(){
+  	output.value = convertToText(customDecompress(txt.value));
+  });
+</script>
+<style>
+  textarea {
+    resize: none;
+    width: 90vw;
+    height: 45vh;
+  }
+</style>
